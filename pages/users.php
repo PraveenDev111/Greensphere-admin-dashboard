@@ -21,86 +21,16 @@
     <!-- partial:../partials/_navbar.html -->
     <?php
     include '../components/navbar.php';
-    include '../php-files/dbconnect.php';
-
     ?>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:../partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
-        <ul class="nav">
-          <li class="nav-item">
-            <a class="nav-link" href="../index.html">
-              <i class="ti-shield menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-              <i class="ti-palette menu-icon"></i>
-              <span class="menu-title">UI Elements</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="ui-basic">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="../pages/ui-features/buttons.html">Buttons</a></li>
-                <li class="nav-item"> <a class="nav-link" href="../pages/ui-features/typography.html">Typography</a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../pages/forms/basic_elements.html">
-              <i class="ti-layout-list-post menu-icon"></i>
-              <span class="menu-title">Form elements</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../pages/charts/chartjs.html">
-              <i class="ti-pie-chart menu-icon"></i>
-              <span class="menu-title">Charts</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../pages/tables/basic-table.html">
-              <i class="ti-view-list-alt menu-icon"></i>
-              <span class="menu-title">Tables</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../pages/icons/themify.html">
-              <i class="ti-star menu-icon"></i>
-              <span class="menu-title">Icons</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-              <i class="ti-user menu-icon"></i>
-              <span class="menu-title">User Pages</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="../pages/samples/login.html"> Login </a></li>
-                <li class="nav-item"> <a class="nav-link" href="../pages/samples/login-2.html"> Login 2 </a></li>
-                <li class="nav-item"> <a class="nav-link" href="../pages/samples/register.html"> Register </a></li>
-                <li class="nav-item"> <a class="nav-link" href="../pages/samples/register-2.html"> Register 2 </a></li>
-                <li class="nav-item"> <a class="nav-link" href="../pages/samples/lock-screen.html"> Lockscreen </a></li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../documentation/documentation.html">
-              <i class="ti-write menu-icon"></i>
-              <span class="menu-title">Documentation</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <?php include "../components/sidebar.html" ?>
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-lg-6 grid-margin stretch-card">
+            <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
                   <h4 class="card-title">Users Data</h4>
@@ -116,42 +46,81 @@
                           <th>Username</th>
                           <th>Email</th>
                           <th>Created</th>
+                          <th>Updated</th>
+                          <th>Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <?php
-                        // Write SQL query
-                        $sql = "SELECT id, username, email, created_at FROM users";
-                        $result = $conn->query($sql);
-                        if ($result->num_rows > 0) {
-                          // Output data of each row
-                          while($row = $result->fetch_assoc()) {
-                              echo "<tr><td>". $row["id"]. "</td><td>" . $row["username"]. "</td><td>" . $row["email"]. "</td><td>".substr($row["created_at"], 0, 9)."</td></tr>";
-                          }
-                      } else {
-                          echo "<tr><td></td><td></td><td></td><td></td></tr>";
-                      }
-                        ?>
+                      <?php
+                      if (isset($_SESSION['status_message'])) {
+                        echo "<script>alert('" . $_SESSION['status_message'] . "');</script>";
+                        unset($_SESSION['status_message']); // Clear the message after displaying it
+                    }
+                  // URL of the Spring Boot API
+                  $url = "http://localhost:8090/api/v1/admin/users/all";
 
-                        
+                  // Initialize cURL
+                  $ch = curl_init($url);
+
+                  // Set cURL options
+                  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+
+                  // Execute cURL request
+                  $response = curl_exec($ch);
+
+                  // Close cURL session
+                  curl_close($ch);
+
+                  // Decode the JSON response
+                  $data = json_decode($response, true);
+
+                  // Check if the response contains data
+                  if (!empty($data)) {
+                      // Iterate over each user
+                      foreach ($data as $row) {
+                          $id = htmlspecialchars($row["id"]);
+                          $status = ($row["status"]) ? "Active" : "Disabled";
+                          $username = htmlspecialchars($row["username"]); // Avoid XSS attacks
+                          $email = htmlspecialchars($row["email"]);
+                          $createdDateTime = substr(htmlspecialchars($row["createdDateTime"]), 0, 19);
+                          $updatedDateTime = substr(htmlspecialchars($row["updatedDateTime"]), 0, 19);
+                          //button color for status change
+                          $buttonColor = $row["status"] ? "#28a745" : "#dc3545";
+
+                          echo <<<HTML
+                          <tr>
+                              <td>{$id}</td>
+                              <td>{$username}</td>
+                              <td>{$email}</td>
+                              <td>{$createdDateTime}</td>
+                              <td>{$updatedDateTime}</td>
+                              <td>
+                                <form method="POST" action="../php-files/update_status.php">
+                                      <input type="hidden" name="user_id" value="{$id}">
+                                      <input type="hidden" name="current_status" value="{$row['status']}">
+                                      <button type="submit" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: {$buttonColor}">{$status} | Change</button>
+                                  </form>
+                              </td>
+                          </tr>
+                          HTML;
+                      }
+                  } else {
+                      echo "<tr><td colspan='6'>No data found</td></tr>";
+                  }
+                  ?>
+
+
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-          
           </div>
         </div>
         <!-- content-wrapper ends -->
-        <!-- partial:../partials/_footer.html -->
-        <footer class="footer">
-          <div class="d-sm-flex justify-content-center justify-content-sm-between">
-            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © <a href="https://www.bootstrapdash.com/" target="_blank">bootstrapdash.com </a>2021</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Only the best <a href="https://www.bootstrapdash.com/" target="_blank"> Bootstrap dashboard </a> templates</span>
-          </div>
-        </footer>
-        <!-- partial -->
+        <?php include "../components/footer.php"; ?>
       </div>
       <!-- main-panel ends -->
     </div>
