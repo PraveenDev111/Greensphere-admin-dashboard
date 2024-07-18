@@ -48,6 +48,10 @@
                           <th>Created</th>
                           <th>Updated</th>
                           <th>Status</th>
+                          <th>First name</th>
+                          <th>Last name</th>
+                          <th>Address</th>
+                          <th>Contact info</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -85,6 +89,10 @@
                           $email = htmlspecialchars($row["email"]);
                           $createdDateTime = substr(htmlspecialchars($row["createdDateTime"]), 0, 19);
                           $updatedDateTime = substr(htmlspecialchars($row["updatedDateTime"]), 0, 19);
+                          $fname = htmlspecialchars($row["first_name"]);
+                          $lname = htmlspecialchars($row["last_name"]);
+                          $contact = htmlspecialchars($row["contact_info"]);
+                          $address = htmlspecialchars($row["address"]);
                           //button color for status change
                           $buttonColor = $row["status"] ? "#28a745" : "#dc3545";
 
@@ -102,6 +110,10 @@
                                       <button type="submit" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: {$buttonColor}">{$status} | Change</button>
                                   </form>
                               </td>
+                              <td>{$fname}</td>
+                              <td>{$lname}</td>
+                              <td>{$address}</td>
+                              <td>{$contact}</td>
                           </tr>
                           HTML;
                       }
