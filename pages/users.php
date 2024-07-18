@@ -52,6 +52,7 @@
                           <th>Last name</th>
                           <th>Address</th>
                           <th>Contact info</th>
+                          <th>Delete</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -104,16 +105,15 @@
                               <td>{$createdDateTime}</td>
                               <td>{$updatedDateTime}</td>
                               <td>
-                                <form method="POST" action="../php-files/update_status.php">
-                                      <input type="hidden" name="user_id" value="{$id}">
-                                      <input type="hidden" name="current_status" value="{$row['status']}">
-                                      <button type="submit" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: {$buttonColor}">{$status} | Change</button>
-                                  </form>
+                                  <button onclick="updateStatus({$id},{$row['status']})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px;color: white; background-color: {$buttonColor}">{$status} | Change</button>
                               </td>
                               <td>{$fname}</td>
                               <td>{$lname}</td>
                               <td>{$address}</td>
                               <td>{$contact}</td>
+                              <td>
+                              <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
+                              </td>
                           </tr>
                           HTML;
                       }
@@ -133,6 +133,74 @@
         </div>
         <!-- content-wrapper ends -->
         <?php include "../components/footer.php"; ?>
+          <script>
+            function deleteUser(userId) {
+              if (confirm('Are you sure you want to delete this user?')) {
+                  fetch(`http://localhost:8090/api/v1/admin/users/delete/${userId}`, {
+                      method: 'DELETE'
+                  })
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      alert('User deleted successfully');
+                      // Optionally, you can refresh the page or update the UI to reflect the deletion
+                      location.reload();
+                  })
+                  .catch(error => {
+                      console.error('There was a problem with the fetch operation:', error);
+                      alert('Failed to delete user');
+                  });
+              }
+            }
+            function updateStatus(userId, currentStatus) {
+            // Prompt user for confirmation
+            var confirmChange = confirm("Are you sure you want to change the status?");
+
+            if (confirmChange) {
+                // Determine the new status
+                var newStatus = currentStatus == 1 ? 0 : 1;
+
+                // URL of the Spring Boot API
+                var url = `http://localhost:8090/api/v1/admin/users/status/${newStatus}`;
+
+                // Data to be sent in the request body
+                var data = JSON.stringify({ id: userId });
+
+                // Create a new request
+                var xhr = new XMLHttpRequest();
+
+                // Configure it: PUT-request for the URL
+                xhr.open("PUT", url, true);
+
+                // Set the request header for JSON content type
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                // Callback function for when the request completes
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // Parse the JSON response
+                        var response = JSON.parse(xhr.responseText);
+
+                        // Alert success message
+                        location.reload();
+                        alert("Status changed successfully.");
+
+                        // Optionally, you can update the UI or redirect the page
+                         // Refresh the page
+                    } else {
+                        // Handle errors
+                        alert("Failed to update status: " + xhr.statusText);
+                    }
+                };
+
+                // Send the request with the data
+                xhr.send(data);
+            } else {
+                alert("Status change canceled.");
+            }
+        }
+          </script>
       </div>
       <!-- main-panel ends -->
     </div>
