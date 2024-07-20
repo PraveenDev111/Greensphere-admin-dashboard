@@ -35,7 +35,7 @@
                 <div class="card-body">
                   <h4 class="card-title">Users Data</h4>
                   <p class="card-description">
-                    All users in database
+                    All users in database - scroll right to make changes
                     <!--Add class <code>.table</code>-->
                   </p>
                   <div class="table-responsive">
@@ -112,7 +112,7 @@
                               <td>{$address}</td>
                               <td>{$contact}</td>
                               <td>
-                              <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
+                              <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:100px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
                               </td>
                           </tr>
                           HTML;
