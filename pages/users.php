@@ -13,7 +13,7 @@
   <!-- inject:css -->
   <link rel="stylesheet" href="../css/style.css">
   <!-- endinject -->
-  <link rel="shortcut icon" href="../images/gs-logo-.png" />
+  <link rel="shortcut icon" href="../images/gs-logo.png" />
 </head>
 
 <body>
@@ -60,69 +60,67 @@
                       if (isset($_SESSION['status_message'])) {
                         echo "<script>alert('" . $_SESSION['status_message'] . "');</script>";
                         unset($_SESSION['status_message']); // Clear the message after displaying it
-                    }
-                  // URL of the Spring Boot API
-                  $url = "http://localhost:8090/api/v1/admin/users/all";
+                        }
+                      // URL of the Spring Boot API
+                      $url = "http://localhost:8090/api/v1/admin/users/all";
 
-                  // Initialize cURL
-                  $ch = curl_init($url);
+                      // Initialize cURL
+                      $ch = curl_init($url);
 
-                  // Set cURL options
-                  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                      // Set cURL options
+                      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 
-                  // Execute cURL request
-                  $response = curl_exec($ch);
+                      // Execute cURL request
+                      $response = curl_exec($ch);
 
-                  // Close cURL session
-                  curl_close($ch);
+                      // Close cURL session
+                      curl_close($ch);
 
-                  // Decode the JSON response
-                  $data = json_decode($response, true);
+                      // Decode the JSON response
+                      $data = json_decode($response, true);
 
-                  // Check if the response contains data
-                  if (!empty($data)) {
-                      // Iterate over each user
-                      foreach ($data as $row) {
-                          $id = htmlspecialchars($row["id"]);
-                          $status = ($row["status"]) ? "Active" : "Disabled";
-                          $username = htmlspecialchars($row["username"]); // Avoid XSS attacks
-                          $email = htmlspecialchars($row["email"]);
-                          $createdDateTime = substr(htmlspecialchars($row["createdDateTime"]), 0, 19);
-                          $updatedDateTime = substr(htmlspecialchars($row["updatedDateTime"]), 0, 19);
-                          $fname = htmlspecialchars($row["first_name"]);
-                          $lname = htmlspecialchars($row["last_name"]);
-                          $contact = htmlspecialchars($row["contact_info"]);
-                          $address = htmlspecialchars($row["address"]);
-                          //button color for status change
-                          $buttonColor = $row["status"] ? "#28a745" : "#dc3545";
+                      // Check if the response contains data
+                      if (!empty($data)) {
+                          // Iterate over each user
+                          foreach ($data as $row) {
+                              $id = htmlspecialchars($row["id"]);
+                              $status = ($row["status"]) ? "Active" : "Disabled";
+                              $username = htmlspecialchars($row["username"]); // Avoid XSS attacks
+                              $email = htmlspecialchars($row["email"]);
+                              $createdDateTime = substr(htmlspecialchars($row["createdDateTime"]), 0, 19);
+                              $updatedDateTime = substr(htmlspecialchars($row["updatedDateTime"]), 0, 19);
+                              $fname = htmlspecialchars($row["first_name"]);
+                              $lname = htmlspecialchars($row["last_name"]);
+                              $contact = htmlspecialchars($row["contact_info"]);
+                              $address = htmlspecialchars($row["address"]);
+                              //button color for status change
+                              $buttonColor = $row["status"] ? "#28a745" : "#dc3545";
 
-                          echo <<<HTML
-                          <tr>
-                              <td>{$id}</td>
-                              <td>{$username}</td>
-                              <td>{$email}</td>
-                              <td>{$createdDateTime}</td>
-                              <td>{$updatedDateTime}</td>
-                              <td>
-                                  <button onclick="updateStatus({$id},{$row['status']})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px;color: white; background-color: {$buttonColor}">{$status} | Change</button>
-                              </td>
-                              <td>{$fname}</td>
-                              <td>{$lname}</td>
-                              <td>{$address}</td>
-                              <td>{$contact}</td>
-                              <td>
-                              <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:100px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
-                              </td>
-                          </tr>
-                          HTML;
+                              echo <<<HTML
+                              <tr>
+                                  <td>{$id}</td>
+                                  <td>{$username}</td>
+                                  <td>{$email}</td>
+                                  <td>{$createdDateTime}</td>
+                                  <td>{$updatedDateTime}</td>
+                                  <td>
+                                      <button onclick="updateStatus({$id},{$row['status']})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px;color: white; background-color: {$buttonColor}">{$status} | Change</button>
+                                  </td>
+                                  <td>{$fname}</td>
+                                  <td>{$lname}</td>
+                                  <td>{$address}</td>
+                                  <td>{$contact}</td>
+                                  <td>
+                                  <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:100px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
+                                  </td>
+                              </tr>
+                              HTML;
+                          }
+                      } else {
+                          echo "<tr><td colspan='6'>No data found</td></tr>";
                       }
-                  } else {
-                      echo "<tr><td colspan='6'>No data found</td></tr>";
-                  }
-                  ?>
-
-
+                      ?>
                       </tbody>
                     </table>
                   </div>
