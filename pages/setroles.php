@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Greensphere Admin</title>
+  <title>GS | Roles</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../vendors/base/vendor.bundle.base.css">
@@ -87,7 +87,12 @@
                             curl_close($ch2);
                             
                             $roleData = json_decode($roleResponse, true);
-                            $role = !empty($roleData) ? htmlspecialchars($roleData[0]['role']) : "none";
+                            if (!empty($roleData) && isset($roleData[0]['role'])) {
+                              $role = htmlspecialchars($roleData[0]['role']);
+                          } else {
+                              $role = "none";
+                          }
+                  
                             $adminSelected = $role === 'Admin' ? 'selected' : '';
                             $userSelected = $role === 'User' ? 'selected' : '';
                             $superAdminSelected = $role === 'Super Admin' ? 'selected' : '';
@@ -102,7 +107,8 @@
                                             <button onclick="updateStatus({$id},{$row['status']})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px;color: white; background-color: {$buttonColor}">{$status} | Change</button>
                                         </td>
                                         <td>
-                                        <select id="role-dropdown-{$id}" onchange="updateRole({$id}, this.value)" style="padding:5px; border-radius:5px;">
+                                        <select id="role-dropdown" onchange="updateRole({$id}, this.value)" style="padding:5px; border-radius:5px;">
+                                            <option value="none" $noneSelected>none</option> 
                                             <option value="Admin" $adminSelected>Admin</option>
                                             <option value="User" $userSelected>User</option>
                                             <option value="Super Admin" $superAdminSelected>Super Admin</option>
@@ -133,15 +139,15 @@
               xhr.setRequestHeader("Content-Type", "application/json");
 
               var data = JSON.stringify({ "userId": userId, "role": role });
-
+              
               xhr.onreadystatechange = function () {
                   if (xhr.readyState === 4) {
                       if (xhr.status === 200) {
-                          alert('Role updated successfully!');
-                          //role not changing after refreshing, but updates db via endpoint
-                          document.getElementById('role-dropdown-' + userId).value = role;
+                          alert('Role changed to '+role+' successfully!');
+                          location.reload();
                       } else {
                           alert('Error: Unable to update role.');
+                          location.reload();
                       }
                   }
               };

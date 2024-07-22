@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>GS | All users</title>
+  <title>GS | System Logs</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../vendors/base/vendor.bundle.base.css">
@@ -33,87 +33,62 @@
             <div class="col-lg-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Users Data</h4>
+                  <h4 class="card-title">System Logs</h4>
                   <p class="card-description">
-                    All users in database - scroll right to make changes
+                    Viewing all system logs
                     <!--Add class <code>.table</code>-->
                   </p>
                   <div class="table-responsive">
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>U_ID</th>
+                          <th>Log ID</th>
+                          <th>User_ID</th>
                           <th>Username</th>
-                          <th>Email</th>
-                          <th>Created</th>
-                          <th>Updated</th>
-                          <th>Status</th>
-                          <th>First name</th>
-                          <th>Last name</th>
-                          <th>Address</th>
-                          <th>Contact info</th>
-                          <th>Delete</th>
+                          <th>Action</th>
+                          <th>Details</th>
+                          <th>Action time</th>
                         </tr>
                       </thead>
                       <tbody>
                       <?php
-                      if (isset($_SESSION['status_message'])) {
-                        echo "<script>alert('" . $_SESSION['status_message'] . "');</script>";
-                        unset($_SESSION['status_message']); // Clear the message after displaying it
-                        }
                       // URL of the Spring Boot API
-                      $url = "http://localhost:8090/api/v1/admin/users/all";
-
-                      // Initialize cURL
+                      $url = "http://localhost:8090/api/v1/admin/systemlogs/";
                       $ch = curl_init($url);
-
-                      // Set cURL options
                       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                       curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-
-                      // Execute cURL request
                       $response = curl_exec($ch);
-
-                      // Close cURL session
                       curl_close($ch);
-
-                      // Decode the JSON response
                       $data = json_decode($response, true);
-
-                      // Check if the response contains data
                       if (!empty($data)) {
+
+                        
                           // Iterate over each user
                           foreach ($data as $row) {
                               $id = htmlspecialchars($row["id"]);
-                              $status = ($row["status"]) ? "Active" : "Disabled";
-                              $username = htmlspecialchars($row["username"]); // Avoid XSS attacks
-                              $email = htmlspecialchars($row["email"]);
-                              $createdDateTime = substr(htmlspecialchars($row["createdDateTime"]), 0, 19);
-                              $updatedDateTime = substr(htmlspecialchars($row["updatedDateTime"]), 0, 19);
-                              $fname = htmlspecialchars($row["first_name"]);
-                              $lname = htmlspecialchars($row["last_name"]);
-                              $contact = htmlspecialchars($row["contact_info"]);
-                              $address = htmlspecialchars($row["address"]);
-                              //button color for status change
-                              $buttonColor = $row["status"] ? "#28a745" : "#dc3545";
+                              $action = htmlspecialchars($row["action"]);
+                              $createdDateTime = substr(htmlspecialchars($row["timestamp"]), 0, 19);
+                              $details = htmlspecialchars($row["details"]);
+                              $userId = htmlspecialchars($row["userId"]);
+                              
+                              //get username
+                              $url2 = "http://localhost:8090/api/v1/admin/users/get/$userId";
+                              $ch2 = curl_init($url2);
+                              curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+                              curl_setopt($ch2, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                              $response2 = curl_exec($ch2);
+                              curl_close($ch2);
+                              $data2 = json_decode($response2, true);
+                              $username = htmlspecialchars($data2["username"]);
 
                               echo <<<HTML
                               <tr>
-                                  <td>{$id}</td>
-                                  <td>{$username}</td>
-                                  <td>{$email}</td>
-                                  <td>{$createdDateTime}</td>
-                                  <td>{$updatedDateTime}</td>
-                                  <td>
-                                      <button onclick="updateStatus({$id},{$row['status']})" style="padding:10px; width:170px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px;color: white; background-color: {$buttonColor}">{$status} | Change</button>
-                                  </td>
-                                  <td>{$fname}</td>
-                                  <td>{$lname}</td>
-                                  <td>{$address}</td>
-                                  <td>{$contact}</td>
-                                  <td>
-                                  <button type="submit" onclick= "deleteUser({$id})" style="padding:10px; width:100px;border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  border-radius: 5px; cursor: pointer;color: white; background-color: #dc3545">Delete</button>
-                                  </td>
+                                <td>$id</td>
+                                <td>$userId</td>
+                                <td>$username</td>
+                                <td>$action</td>
+                                <td>$details</td>
+                                <td>$createdDateTime</td>
                               </tr>
                               HTML;
                           }
