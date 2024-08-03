@@ -134,7 +134,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
                 <i class="ti-settings text-primary"></i>
                 Settings
               </a>
-              <a class="dropdown-item" href="php-files/logout.php">
+              <a class="dropdown-item" href="../php-files/logout.php">
                 <i class="ti-power-off text-primary"></i>
                 Logout
               </a>

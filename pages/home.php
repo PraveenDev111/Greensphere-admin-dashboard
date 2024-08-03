@@ -15,7 +15,7 @@
   <!-- inject:css -->
   <link rel="stylesheet" href="../css/style.css">
   <!-- endinject -->
-  <link rel="shortcut icon" href="../images/gs-logo-.png" />
+  <link rel="shortcut icon" href="../images/gs-logo-.png"  type="image/png"/>
 </head>
 
 <body>
@@ -49,13 +49,13 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Sales</p>
+                  <p class="card-title text-md-center text-xl-left">Turnover</p>
                   <div
                     class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">34040</h3>
+                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">$34,040</h3>
                     <i class="ti-calendar icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
                   </div>
-                  <p class="mb-0 mt-2 text-danger">0.12% <span class="text-black ms-1"><small>(30 days)</small></span>
+                  <p class="mb-0 mt-2 text-success">78% <span class="text-black ms-1"><small>This month</small></span>
                   </p>
                 </div>
               </div>
@@ -63,27 +63,13 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Revenue</p>
+                  <p class="card-title text-md-center text-xl-left">Fines</p>
                   <div
                     class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">47033</h3>
-                    <i class="ti-user icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
-                  </div>
-                  <p class="mb-0 mt-2 text-danger">0.47% <span class="text-black ms-1"><small>(30 days)</small></span>
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Downloads</p>
-                  <div
-                    class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">40016</h3>
+                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">$800</h3>
                     <i class="ti-agenda icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
                   </div>
-                  <p class="mb-0 mt-2 text-success">64.00%<span class="text-black ms-1"><small>(30 days)</small></span>
+                  <p class="mb-0 mt-2 text-danger">64.00%<span class="text-black ms-1"><small>Pending payment</small></span>
                   </p>
                 </div>
               </div>
@@ -91,13 +77,27 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Returns</p>
+                  <p class="card-title text-md-center text-xl-left">Registered Users</p>
                   <div
                     class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0">61344</h3>
+                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0" id="total-users">...</h3>
+                    <i class="ti-user icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
+                  </div>
+                  <p class="mb-0 mt-2 text-success" id="active-percentage">0.00% <span class="text-black ms-1"><small>Active</small></span></p>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <p class="card-title text-md-center text-xl-left">Disabled users</p>
+                  <div
+                    class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
+                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0" id="inactive-users">...</h3>
                     <i class="ti-layers-alt icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
                   </div>
-                  <p class="mb-0 mt-2 text-success">23.00%<span class="text-black ms-1"><small>(30 days)</small></span>
+                  <p class="mb-0 mt-2 text-danger" id="inactive-percentage">0.00%<span class="text-black ms-1"><small>This month</small></span>
                   </p>
                 </div>
               </div>
@@ -107,7 +107,7 @@
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title">Sales details</p>
+                  <p class="card-title">Garbage categories</p>
                   <p class="text-muted font-weight-light">Received overcame oh sensible so at an. Formed do change
                     merely to county it. Am separate contempt domestic to to oh. On relation my so addition branched.
                   </p>
@@ -136,28 +136,50 @@
                 </div>
               </div>
             </div>
+            <?php
+              // Set the URL of the health endpoint
+              $healthUrl = "http://localhost:8090/actuator/health";
+              $ch = curl_init();
+              curl_setopt($ch, CURLOPT_URL, $healthUrl);
+              curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+              curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+              $response = curl_exec($ch);
+
+              if ($response === false) {
+                  $error = curl_error($ch);
+                  curl_close($ch);
+                  $dbstatus = 'Error: Timeout';
+              } else {
+                  curl_close($ch);
+                  $data = json_decode($response, true);
+                  if (isset($data['status'])) {
+                      $dbstatus = ($data['status'] === 'UP') ? 'Connected' : 'DOWN';
+                  } else {
+                      $dbstatus = 'Invalid response format';
+                  }
+              }
+              ?>
             <div class="col-md-6 grid-margin stretch-card">
               <div class="card border-bottom-0">
                 <div class="card-body pb-0">
-                  <p class="card-title">Purchases</p>
-                  <p class="text-muted font-weight-light">The argument in favor of using filler text goes something like
-                    this: If you use real content in the design process, anytime you reach a review</p>
+                <p class="card-title">DB Health monitor</p>
+                  <p class="text-muted font-weight-light">Maintain a healthy DB and monitor your DB. Check for any anomallies or excess executions in the last 24-hour</p>
                   <div class="d-flex flex-wrap mb-5">
                     <div class="me-5 mt-3">
-                      <p class="text-muted">Status</p>
-                      <h3>362</h3>
+                      <p class="text-muted">DB Actuator Health</p>
+                      <h3 id="db-status"><?php echo $dbstatus ?></h3>
                     </div>
                     <div class="me-5 mt-3">
-                      <p class="text-muted">New users</p>
-                      <h3>187</h3>
+                      <p class="text-muted">All users</p>
+                      <h3 id="all-users">...</h3>
                     </div>
                     <div class="me-5 mt-3">
-                      <p class="text-muted">Chats</p>
-                      <h3>524</h3>
+                      <p class="text-muted">Disposal records</p>
+                      <h3 id="disposal-value">...</h3>
                     </div>
                     <div class="mt-3">
-                      <p class="text-muted">Feedbacks</p>
-                      <h3>509</h3>
+                      <p class="text-muted">Executions on DB /24hr</p>
+                      <h3 id="executions-value">...</h3>
                     </div>
                   </div>
                 </div>
@@ -418,6 +440,52 @@
   <script src="../js/todolist.js"></script>
   <!-- endinject -->
   <!-- Custom js for this page-->
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch("http://localhost:8090/api/v1/admin/users/allusers")
+        .then(response => response.json())
+        .then(data => {
+            // Calculate the total number of users
+            const totalUsers = data.length;
+            // Number of active users
+            const activeUsers = data.filter(user => user.status === true).length;
+            const inactiveUsers = data.filter(user => user.status === false).length;
+            const activePercentage = ((activeUsers / totalUsers) * 100).toFixed(2);
+            const inactivePercentage = ((inactiveUsers / totalUsers) * 100).toFixed(2);
+            // Update the HTML content with the total number of users
+            document.getElementById('active-percentage').innerHTML = `${activePercentage}% <span class="text-black ms-1"><small>Active</small></span>`;
+            document.getElementById('inactive-percentage').innerHTML = `${inactivePercentage}% <span class="text-black ms-1"><small>This month</small></span>`;
+            document.getElementById('inactive-users').textContent = inactiveUsers;
+            animateCounter('all-users', totalUsers);
+            animateCounter('total-users', totalUsers);
+            animateCounter('inactive-users', inactiveUsers);
+            animateCounter('disposal-value', 520);
+            animateCounter('executions-value', 109020);
+            
+            // Fetch the database health status
+            
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}); 
+  function animateCounter(elementId, endValue) {
+    const element = document.getElementById(elementId);
+    let startValue = 0;
+    const duration = 2000; // Duration of the animation in milliseconds
+    const increment = Math.ceil(endValue / (duration / 20)); // Increment based on the duration and refresh rate (20ms)
+
+    const counter = setInterval(() => {
+      startValue += increment;
+      if (startValue >= endValue) {
+        startValue = endValue;
+        clearInterval(counter);
+      }
+      element.textContent = startValue;
+    }, 20); // Update the counter every 20ms
+  }
+
+  </script>
   <script src="../js/dashboard.js"></script>
   <!-- End custom js for this page-->
 </body>
