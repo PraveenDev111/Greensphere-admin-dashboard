@@ -57,6 +57,7 @@
                           <th>U_ID</th>
                           <th>Username</th>
                           <th>Email</th>
+                          <th>Role</th>
                           <th>Created</th>
                           <th>Updated</th>
                           <th>Status</th>
@@ -95,7 +96,7 @@
     });
 
     function fetchUsers(page, limit) {
-        const url = `http://localhost:8090/api/v1/admin/users/all?offset=${page}&limit=${limit}`;
+        const url = `http://localhost:8090/api/v1/admin/all?offset=${page}&limit=${limit}`;
 
         fetch(url)
             .then(response => response.json())
@@ -109,7 +110,7 @@
             });
     }
     function fetchAllUsers() {
-        fetch('http://localhost:8090/api/v1/admin/users/allusers')
+        fetch('http://localhost:8090/api/v1/admin/allusers')
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -149,6 +150,7 @@
             const email = htmlspecialchars(String(row.email));
             const createdDateTime = substr(htmlspecialchars(String(row.createdDateTime)), 0, 19);
             const updatedDateTime = substr(htmlspecialchars(String(row.updatedDateTime)), 0, 19);
+            const role = row.role? substr(htmlspecialchars(String(row.role)), 0, 19) : "none";
             const fname = htmlspecialchars(String(row.first_name));
             const lname = htmlspecialchars(String(row.last_name));
             const contact = htmlspecialchars(String(row.contact_info));
@@ -160,6 +162,7 @@
                     <td>${id}</td>
                     <td>${username}</td>
                     <td>${email}</td>
+                    <td>${role}</td>
                     <td>${createdDateTime}</td>
                     <td>${updatedDateTime}</td>
                     <td>
@@ -198,7 +201,7 @@
     }
             function deleteUser(userId) {
               if (confirm('Are you sure you want to delete this user?')) {
-                  fetch(`http://localhost:8090/api/v1/admin/users/delete/${userId}`, {
+                  fetch(`http://localhost:8090/api/v1/admin/delete/${userId}`, {
                       method: 'DELETE'
                   })
                   .then(response => {
@@ -224,7 +227,7 @@
                 var newStatus = currentStatus == 1 ? 0 : 1;
 
                 // URL of the Spring Boot API
-                var url = `http://localhost:8090/api/v1/admin/users/status/${newStatus}`;
+                var url = `http://localhost:8090/api/v1/admin/status/${newStatus}`;
 
                 // Data to be sent in the request body
                 var data = JSON.stringify({ id: userId });

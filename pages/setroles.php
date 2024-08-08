@@ -54,7 +54,7 @@
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>U_ID</th>
+                          <th>Admin ID</th>
                           <th>Username</th>
                           <th>Email</th>
                           <th>Status</th>
@@ -89,7 +89,7 @@
           });
 
           function fetchUsers(page, limit) {
-              const url = `http://localhost:8090/api/v1/admin/users/all?offset=${page}&limit=${limit}`;
+              const url = `http://localhost:8090/api/v1/admin/all?offset=${page}&limit=${limit}`;
 
               fetch(url)
                   .then(response => response.json())
@@ -103,7 +103,7 @@
                   });
           }
           function fetchAllUsers() {
-            fetch('http://localhost:8090/api/v1/admin/users/allusers')
+            fetch('http://localhost:8090/api/v1/admin/allusers')
                 .then(response => response.json())
                 .then(data => {
                     if (Array.isArray(data)) {
@@ -130,53 +130,70 @@
                 console.error('allUsers is not an array:', allUsers);
             }
         }
-          function populateTable(data) {
-            const tableBody = document.getElementById('user-table-body');
-            tableBody.innerHTML = ''; // Clear previous data
-            data.forEach(row => {
-                const id = htmlspecialchars(String(row.id));
-                const status = row.status ? "Active" : "Disabled";
-                const username = htmlspecialchars(String(row.username));
-                const email = htmlspecialchars(String(row.email));
-                const buttonColor = row.status ? "#28a745" : "#dc3545";
+        function populateTable(data) {
+        const tableBody = document.getElementById('user-table-body');
+        tableBody.innerHTML = ''; // Clear previous data
+        
+        const allowedRoles = ["admin", "super admin", "supervisor", "analyst", "viewer"];
 
-                // Fetch user role
-                const roleUrl = `http://localhost:8090/api/v1/admin/userrole/${id}`;
-                fetch(roleUrl)
-                    .then(response => response.json())
-                    .then(roleData => {
-                        let role = "none";
-                        if (roleData && roleData.length > 0 && roleData[0].role) {
-                            role = htmlspecialchars(String(roleData[0].role));
-                        }
+        data.forEach(row => {
+            const id = htmlspecialchars(String(row.id));
+            const status = row.status ? "Active" : "Disabled";
+            const username = htmlspecialchars(String(row.username));
+            const email = htmlspecialchars(String(row.email));
+            const buttonColor = row.status ? "#28a745" : "#dc3545";
+            const role = htmlspecialchars(String(row.role || "none")); // Default to "none" if role is null or undefined
 
-                        // Generate options for the role dropdown
-                        const roles = ['none', 'Admin', 'User', 'Super Admin'];
-                        let roleOptions = roles.map(r => {
-                            const selected = role === r ? 'selected' : '';
-                            return `<option value="${r}" ${selected}>${r}</option>`;
-                        }).join('');
+            // Generate options for the role dropdown
+            const roleOptions = allowedRoles.map(r => `
+                <option value="${r}" ${r === role ? 'selected' : ''}>${r}</option>
+            `).join('');
 
-                        const rowHTML = `
-                            <tr>
-                                <td>${id}</td>
-                                <td>${username}</td>
-                                <td>${email}</td>
-                                <td>
-                                    <button onclick="updateStatus(${id}, ${row.status})" style="padding:10px; width:170px; border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 5px; color: white; background-color: ${buttonColor}">${status} | Change</button>
-                                </td>
-                                <td>
-                                    <select id="role-dropdown-${id}" onchange="updateRole(${id}, this.value)" style="padding:5px; border-radius:5px;">
-                                        ${roleOptions}
-                                    </select>
-                                </td>
-                            </tr>
-                        `;
-                        tableBody.innerHTML += rowHTML;
-                    })
-                    .catch(error => console.error('Error fetching user role:', error));
-            });
+            const rowHTML = `
+                <tr>
+                    <td>${id}</td>
+                    <td>${username}</td>
+                    <td>${email}</td>
+                    <td>
+                        <button onclick="updateStatus(${id}, ${row.status})" style="padding:10px; width:170px; border: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 5px; color: white; background-color: ${buttonColor}">${status} | Change</button>
+                    </td>
+                    <td>
+                        <select id="role-dropdown-${id}" onchange="updateRole(${id}, this.value)" style="padding:5px; border-radius:5px;">
+                            ${roleOptions}
+                        </select>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += rowHTML;
+        });
+    }
+
+    function updateRole(userId, role) {
+        if (!role || role.trim() === "") {
+            alert('Invalid role selected. Please select a valid role.');
+            return; // Exit the function early to prevent invalid requests
         }
+
+        var xhr = new XMLHttpRequest();
+        var url = `http://localhost:8090/api/v1/admin/role/${role}`;
+        xhr.open("PUT", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        var data = JSON.stringify({ "id": userId, "role": role });
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    alert('Role changed to ' + role + ' successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: Unable to update role.');
+                }
+            }
+        };
+
+        xhr.send(data);
+    }
         function changePage(direction) {
         currentPage += direction;
         fetchUsers(currentPage, limit);
@@ -220,7 +237,7 @@
       }
             function deleteUser(userId) {
               if (confirm('Are you sure you want to delete this user?')) {
-                  fetch(`http://localhost:8090/api/v1/admin/users/delete/${userId}`, {
+                  fetch(`http://localhost:8090/api/v1/admin/delete/${userId}`, {
                       method: 'DELETE'
                   })
                   .then(response => {
@@ -237,34 +254,34 @@
                   });
               }
             }
-            function updateStatus(userId, currentStatus) {
-            // Prompt user for confirmation
-            var confirmChange = confirm("Are you sure you want to change the status?");
+            function updateRole(userId, role) {
+              if (!role || role.trim() === "") {
+                  alert('Invalid role selected. Please select a valid role.');
+                  return; // Exit the function early to prevent invalid requests
+              }
 
-            if (confirmChange) {
-                var newStatus = currentStatus == 1 ? 0 : 1;
-                var url = `http://localhost:8090/api/v1/admin/users/status/${newStatus}`;
-                var data = JSON.stringify({ id: userId });
-                var xhr = new XMLHttpRequest();
-                xhr.open("PUT", url, true);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.onload = function () {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        var response = JSON.parse(xhr.responseText);
-                        location.reload();
-                        alert("Status changed successfully.");
-                    } else {
-                        // Handle errors
-                        alert("Failed to update status: " + xhr.statusText);
-                    }
-                };
+              var xhr = new XMLHttpRequest();
+              var url = `http://localhost:8090/api/v1/admin/role/${encodeURIComponent(role)}`;
+              xhr.open("PUT", url, true);
+              xhr.setRequestHeader("Content-Type", "application/json");
 
-                // Send the request with the data
-                xhr.send(data);
-            } else {
-                alert("Status change canceled.");
-            }
-        }
+              // Assume userId is the identifier; include additional data as needed
+              var data = JSON.stringify({ "id": userId });
+
+              xhr.onreadystatechange = function () {
+                  if (xhr.readyState === 4) {
+                      if (xhr.status === 200) {
+                          alert('Role changed to ' + role + ' successfully!');
+                          location.reload();
+                      } else {
+                          console.error('Error: ', xhr.responseText);
+                          alert('Error: Unable to update role.');
+                      }
+                  }
+              };
+              xhr.send(data);
+          }
+
           </script>
       </div>
       <!-- main-panel ends -->

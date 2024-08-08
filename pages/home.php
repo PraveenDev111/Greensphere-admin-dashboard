@@ -81,7 +81,7 @@
                   <div
                     class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
                     <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0" id="total-users">...</h3>
-                    <i class="ti-user icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
+                    <i class="fas fa-users icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
                   </div>
                   <p class="mb-0 mt-2 text-success" id="active-percentage">0.00% <span class="text-black ms-1"><small>Active</small></span></p>
                   </p>
@@ -91,13 +91,13 @@
             <div class="col-md-3 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title text-md-center text-xl-left">Disabled users</p>
+                  <p class="card-title text-md-center text-xl-left">Admin accounts</p>
                   <div
                     class="d-flex flex-wrap justify-content-between justify-content-md-center justify-content-xl-between align-items-center">
-                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0" id="inactive-users">...</h3>
-                    <i class="ti-layers-alt icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
+                    <h3 class="mb-0 mb-md-2 mb-xl-0 order-md-1 order-xl-0" id="total-admin-users">...</h3>
+                    <i class="fas fa-user-shield icon-md text-muted mb-0 mb-md-3 mb-xl-0"></i>
                   </div>
-                  <p class="mb-0 mt-2 text-danger" id="inactive-percentage">0.00%<span class="text-black ms-1"><small>This month</small></span>
+                  <p class="mb-0 mt-2 text-danger" id="admin-percentage">0.00%<span class="text-black ms-1"><small>Enabled</small></span>
                   </p>
                 </div>
               </div>
@@ -442,7 +442,7 @@
   <!-- Custom js for this page-->
   <script>
 document.addEventListener('DOMContentLoaded', function() {
-    fetch("http://localhost:8090/api/v1/admin/users/allusers")
+    fetch("http://localhost:8090/api/v1/admin/allusers")
         .then(response => response.json())
         .then(data => {
             // Calculate the total number of users
@@ -453,11 +453,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const activePercentage = ((activeUsers / totalUsers) * 100).toFixed(2);
             const inactivePercentage = ((inactiveUsers / totalUsers) * 100).toFixed(2);
             // Update the HTML content with the total number of users
-            document.getElementById('active-percentage').innerHTML = `${activePercentage}% <span class="text-black ms-1"><small>Active</small></span>`;
-            document.getElementById('inactive-percentage').innerHTML = `${inactivePercentage}% <span class="text-black ms-1"><small>This month</small></span>`;
-            document.getElementById('inactive-users').textContent = inactiveUsers;
-            animateCounter('all-users', totalUsers);
-            animateCounter('total-users', totalUsers);
+            //document.getElementById('active-percentage').innerHTML = `${activePercentage}% <span class="text-black ms-1"><small>Active users</small></span>`;
+            document.getElementById('admin-percentage').innerHTML = `${inactivePercentage}% <span class="text-black ms-1"><small>Disabled</small></span>`;
+            //document.getElementById('inactive-users').textContent = inactiveUsers;
+            animateCounter('total-admin-users', totalUsers);
+            animateCounter('all-users', 490);
+            animateCounter('total-users', 490);
             animateCounter('inactive-users', inactiveUsers);
             animateCounter('disposal-value', 520);
             animateCounter('executions-value', 109020);
